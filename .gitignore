@@ -1,0 +1,35 @@
+# Secrets. .env.example is committed; .env never is.
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Test and tooling caches
+coverage/
+.eslintcache
+.vite/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local database dumps
+*.sql.gz
+*.dump
