@@ -252,7 +252,7 @@ function CookieBanner() {
       border: '1px solid var(--border-dark)', borderRadius: 'var(--radius-card)',
       boxShadow: 'var(--shadow-float)', padding: 22, display: 'flex', flexDirection: 'column', gap: 14
     }}>
-      <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Cookies on nhrsolution.example</span>
+      <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Cookies on nhrsolutions.net</span>
       <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: 'var(--text-body-dark)' }}>
         Essential cookies keep the site working. Optional cookies help measure how pages are used. You can change this at any time.
       </p>

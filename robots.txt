@@ -5,7 +5,5 @@ Disallow: /ui_kits/preview.html
 Disallow: /uploads/
 Disallow: /apps/
 Disallow: /supabase/
-Disallow: /_ds_bundle.js
-Disallow: /_ds_manifest.json
 
-Sitemap: https://www.nhrsolution.co.uk/sitemap.xml
+Sitemap: https://www.nhrsolutions.net/sitemap.xml

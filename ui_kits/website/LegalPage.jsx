@@ -75,7 +75,7 @@ function LegalBody({ doc }) {
           <window.LegalReviewBanner doc={doc} />
 
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', paddingBottom: 24, borderBottom: '1px solid var(--border-light)' }}>
-            {[['Last updated', window.LEGAL_UPDATED], ['Version', window.LEGAL_VERSION], ['Applies to', 'nhrsolution.co.uk and the NHR Solution platform']].map(([k, v]) => (
+            {[['Last updated', window.LEGAL_UPDATED], ['Version', window.LEGAL_VERSION], ['Applies to', 'nhrsolutions.net and the NHR Solution platform']].map(([k, v]) => (
               <span key={k} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted-light)' }}>{k}</span>
                 <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-heading)' }}>{v}</span>
