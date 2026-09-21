@@ -113,7 +113,7 @@ function DemoSteps({ step, done }) {
 }
 
 /* ---------- the booking form ---------- */
-function DemoForm() {
+function DemoForm({ onBooked }) {
   /* Products offered are read from the app registry so nothing unbuilt is
      advertised as demoable. */
   const nav = window.APP_NAV || [];
@@ -177,6 +177,7 @@ function DemoForm() {
     });
     setDone([0, 1, 2]);
     setBooked(saved);
+    if (onBooked) onBooked(saved);
   }
 
   function toggleInterest(label) {
@@ -213,7 +214,7 @@ function DemoForm() {
         </span>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <Button onClick={() => { window.location.href = '../app/index.html'; }} iconRight={<Icon name="ArrowRight" size={18} />}>Explore the Platform</Button>
-          <Button variant="secondary" onClick={() => { setBooked(null); setStep(0); setDone([]); set({ date: '', time: '', consent: false, message: '' }); }}>
+          <Button variant="secondary" onClick={() => { setBooked(null); if (onBooked) onBooked(null); setStep(0); setDone([]); set({ date: '', time: '', consent: false, message: '' }); }}>
             Book Another
           </Button>
         </div>
@@ -494,13 +495,27 @@ function DemoExpect() {
 }
 
 function DemoMain() {
+  const [booked, setBooked] = React.useState(null);
   return (
-    <Section>
-      <div className="demo-split" style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 40, alignItems: 'start' }}>
-        <DemoForm />
-        <DemoExpect />
-      </div>
-    </Section>
+    <React.Fragment>
+      <Section>
+        <div className="demo-split" style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 40, alignItems: 'start' }}>
+          <DemoForm onBooked={setBooked} />
+          <DemoExpect />
+        </div>
+      </Section>
+      {booked && (
+        <Section tone="dark" pattern="both">
+          <SectionHeading tone="dark" align="center"
+            eyebrow="Your demo workspace"
+            title="Everything Your Business Needs. In One Place."
+            description="Click around before the call — every screen runs on demo data." />
+          <div style={{ marginTop: 52 }}>
+            <AppWindow height={640} />
+          </div>
+        </Section>
+      )}
+    </React.Fragment>
   );
 }
 

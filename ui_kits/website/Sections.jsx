@@ -39,8 +39,13 @@ function DashboardShowcase() {
         eyebrow="The Platform"
         title="Everything Your Business Needs. In One Place."
         description="Overview, employees, attendance, payroll, tasks, documents and reporting — one workspace, one login." />
-      <div style={{ marginTop: 52 }}>
-        <AppWindow height={640} />
+      <div style={{ marginTop: 52, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 18, padding: '56px 32px', borderRadius: 'var(--radius-lg)', background: 'var(--surface-card-dark)', border: '1px solid var(--border-dark)' }}>
+        <IconWrapper tone="dark"><Icon name="MonitorPlay" size={24} /></IconWrapper>
+        <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-.01em', color: '#fff' }}>See The Platform In A Live Demo</span>
+        <span style={{ maxWidth: 520, fontSize: 16, lineHeight: 1.6, color: 'var(--text-body-dark)' }}>
+          Book a 30-minute walkthrough and the full workspace opens as soon as your booking is confirmed.
+        </span>
+        <Button href="demo.html" size="lg" iconRight={<Icon name="ArrowRight" size={20} />}>Book A Demo</Button>
       </div>
       <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 32 }}>
         {[['Gauge', 'Live business overview', 'Revenue, headcount, productivity and tasks on one screen.'],
