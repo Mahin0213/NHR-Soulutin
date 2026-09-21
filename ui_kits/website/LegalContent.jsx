@@ -101,7 +101,7 @@ const LEGAL_DOCS = {
         'Fees are based on the plan and the number of active employee records. Archived leavers are not charged for.',
         'Charges are calculated at the start of each period. Adding employees mid-period is charged on the next invoice; removing them reduces the next invoice rather than generating a refund.',
         'Prices exclude VAT. Invoices are due within the period stated on them.',
-        'Prices shown on this website are placeholders pending commercial launch and are not an offer.'
+        'Prices shown on this website are per month and exclude VAT. Yearly billing is ten times the monthly price.'
       ]],
       ['Customer responsibilities', [
         'The customer is the controller of the employee data it puts into the platform. It is responsible for having a lawful basis, for telling its staff in a privacy notice, and for the accuracy of what it enters.',

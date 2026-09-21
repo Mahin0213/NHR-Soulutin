@@ -9,7 +9,7 @@ window.NHR_SITE = {
     { label: 'About', href: 'about.html' },
     { label: 'Support', href: '../app/support.html' }
   ],
-  announcement: { text: 'Introducing NHR Intelligence — smarter workforce insights, built into every plan.', cta: 'Learn More', href: 'hr-software.html' },
+  announcement: { text: 'Introducing NHR Intelligence — smarter workforce insights, built into the platform.', cta: 'Learn More', href: 'hr-software.html' },
   products: [
     { icon: 'Users', title: 'HR Software', href: 'hr-software.html', description: 'Employee records, holiday, absence, attendance, rotas and performance in one workspace.', points: ['Employee management', 'Holiday & leave', 'Attendance & rotas'] },
     { icon: 'Wallet', title: 'Payroll', href: 'payroll.html', description: 'Run payroll, produce payslips and follow cost by department without spreadsheets.', points: ['Payroll processing', 'Payslips', 'Payroll reporting'] },
@@ -90,64 +90,32 @@ window.NHR_SITE = {
     { number: '02', title: 'Set Up Your Workspace', description: 'Configure your business and team.' },
     { number: '03', title: 'Work Smarter', description: 'Let NHR Solution simplify your everyday operations.' }
   ],
-  /* Signup tiers shown in the Get Started modal. Prices derive from the
-     Professional plan below so there is still one source of truth. */
+  /* Signup tiers shown in the Get Started modal; prices come from pricing.bands. */
   signupTiers: [
     { label: '1–5 employees', employees: 5 },
-    { label: '6–15 employees', employees: 15 },
-    { label: '16–30 employees', employees: 30 },
-    { label: '31–60 employees', employees: 60 },
-    { label: '61–120 employees', employees: 120 },
-    { label: '120+ employees', employees: 250 }
+    { label: '6–10 employees', employees: 10 },
+    { label: '11–15 employees', employees: 15 },
+    { label: '16–20 employees', employees: 20 },
+    { label: '21+ employees', employees: 21 }
   ],
 
-  /* PRICING — single source of truth. Placeholder figures: edit here only.
-     Monthly estimate = base + perEmployee × employees (annual applies the discount). */
+  /* PRICING — single source of truth, edit here only. One plan with every
+     feature, priced by headcount band: per month, excluding VAT. Yearly billing
+     is annualMonths × the monthly price. Above the last band is quoted. */
   pricing: {
-    annualDiscount: 0.1667,
-    plans: [
-      { name: 'Starter', blurb: 'For small businesses finding their feet.', base: 19, perEmployee: 2, ctaLabel: 'Get Started',
-        features: ['Basic business tools', 'Employee management', 'Dashboard', 'Basic reporting', 'Email support'] },
-      { name: 'Professional', blurb: 'For growing teams that need the full workspace.', base: 49, perEmployee: 3.5, featured: true, ctaLabel: 'Get Started',
-        features: ['Everything in Starter', 'Advanced analytics', 'Workforce management', 'Payroll tools', 'Advanced reporting', 'Priority support'] },
-      { name: 'Business', blurb: 'For established organisations with structure.', base: 99, perEmployee: 5, ctaLabel: 'Get Started',
-        features: ['Everything in Professional', 'Advanced controls', 'Custom integrations', 'Dedicated support', 'Custom onboarding'] },
-      { name: 'Enterprise', blurb: 'For multi-site and complex operations.', price: 'Custom', ctaLabel: 'Talk to Sales',
-        features: ['Everything in Business', 'Multi-site controls', 'Custom SLAs', 'Named account team', 'Migration support'] }
+    annualMonths: 10,
+    bands: [
+      { upTo: 5, monthly: 40 },
+      { upTo: 10, monthly: 80 },
+      { upTo: 15, monthly: 120 },
+      { upTo: 20, monthly: 160 }
     ],
-    compare: [
-      { group: 'Core', rows: [
-        ['Employee records', true, true, true, true],
-        ['Holiday & leave', true, true, true, true],
-        ['Attendance & timesheets', false, true, true, true],
-        ['Shifts & rotas', false, true, true, true],
-        ['Documents', '1 GB', '10 GB', '50 GB', 'Unlimited']
-      ]},
-      { group: 'Payroll & finance', rows: [
-        ['Payroll tools', false, true, true, true],
-        ['Payslips', false, true, true, true],
-        ['Expense management', false, false, true, true],
-        ['Cost by department', false, true, true, true]
-      ]},
-      { group: 'Insight', rows: [
-        ['Standard reports', true, true, true, true],
-        ['Advanced analytics', false, true, true, true],
-        ['NHR Intelligence summaries', false, true, true, true],
-        ['Custom reporting', false, false, true, true]
-      ]},
-      { group: 'Support', rows: [
-        ['Email support', true, true, true, true],
-        ['Priority support', false, true, true, true],
-        ['Dedicated contact', false, false, true, true],
-        ['Custom onboarding', false, false, true, true]
-      ]}
+    features: [
+      { group: 'People', items: ['Employee records', 'Holiday & leave', 'Absence tracking', 'Attendance & timesheets', 'Shifts & rotas', 'Performance reviews'] },
+      { group: 'Pay & compliance', items: ['Payroll tools', 'Payslips', 'Expense management', 'Documents & contracts', 'Health & safety', 'Training records'] },
+      { group: 'Insight & support', items: ['Reports & analytics', 'NHR Intelligence summaries', 'Cost by department', 'Role-based access', 'Mobile access', 'Email support'] }
     ]
   },
-  plans: [
-    { name: 'Starter', blurb: 'For small businesses.', price: '£29', period: '/month', features: ['Basic business tools', 'Employee management', 'Dashboard', 'Basic reporting', 'Email support'] },
-    { name: 'Professional', blurb: 'For growing teams.', price: '£79', period: '/month', featured: true, features: ['Everything in Starter', 'Advanced analytics', 'Workforce management', 'Payroll tools', 'Advanced reporting', 'Priority support'] },
-    { name: 'Business', blurb: 'For established organisations.', price: 'Custom Pricing', period: '', ctaLabel: 'Contact Us', features: ['Everything in Professional', 'Advanced controls', 'Custom integrations', 'Dedicated support', 'Custom onboarding'] }
-  ],
   testimonials: [
     { quote: 'Attendance, leave and payroll used to live in three different places. Now our managers open one workspace and everything is there.', name: 'Amara Osei', role: 'Operations Director', company: 'Northline Logistics' },
     { quote: 'Setup took an afternoon. The reporting alone changed how we plan our staffing for the month.', name: 'Daniel Whitfield', role: 'Managing Director', company: 'Whitfield & Co.' },
@@ -155,12 +123,12 @@ window.NHR_SITE = {
   ],
   faqs: [
     { q: 'What is NHR Solution?', a: 'NHR Solution brings smart digital tools together to help businesses manage operations, improve productivity and make better decisions.' },
-    { q: 'Which businesses can use NHR Solution?', a: 'The platform is built for small and mid-sized businesses across sectors. Plans scale from a handful of employees to established organisations.' },
+    { q: 'Which businesses can use NHR Solution?', a: 'The platform is built for small businesses across sectors. Prices are published for teams of up to 20 employees, and larger organisations can contact the team for a quote.' },
     { q: 'Can I manage my employees through NHR Solution?', a: 'Yes. Employee records, attendance, leave and documents are managed from a single workspace, with role-based access for managers.' },
     { q: 'Is my business data secure?', a: 'NHR Solution is designed with security, privacy and reliability in mind, including role-based access and privacy-focused data handling.' },
     { q: 'Can NHR Solution grow with my business?', a: 'Plans and tools can be added as your business changes, so the workspace grows alongside your team.' },
     { q: 'Do you offer a free trial?', a: 'Trial availability is confirmed during onboarding. Contact the team to discuss the right starting point for your business.' },
-    { q: 'How can I contact support?', a: 'Starter plans include email support. Professional adds priority support, and Business plans include a dedicated contact.' }
+    { q: 'How can I contact support?', a: 'Every customer gets email support, and the help centre is available at any time.' }
   ],
   footer: [
     { title: 'Products', links: ['HR Software', 'Payroll', 'Health & Safety', 'Employment Law', 'Wellbeing', 'eLearning', 'NHR Intelligence'] },
@@ -170,4 +138,11 @@ window.NHR_SITE = {
     { title: 'Developers', links: ['API', 'Integrations', 'Documentation'] },
     { title: 'Legal', links: ['Privacy', 'Terms', 'Cookies', 'Accessibility'] }
   ]
+};
+
+/* Monthly price for a headcount, or null when it is above the published bands. */
+window.nhrPriceFor = function (employees) {
+  var bands = window.NHR_SITE.pricing.bands;
+  for (var i = 0; i < bands.length; i++) if (employees <= bands[i].upTo) return bands[i];
+  return null;
 };

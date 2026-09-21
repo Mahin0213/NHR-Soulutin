@@ -2,12 +2,10 @@
 const { Button, IconButton, Badge } = window.NHRSolutionDesignSystem_0db691;
 
 function tierOptions() {
-  const P = window.NHR_SITE.pricing;
-  const plan = P.plans.find(p => p.featured) || P.plans[1];
-  return window.NHR_SITE.signupTiers.map(t => ({
-    value: t.label,
-    label: t.label + ' (£' + Math.round(plan.base + plan.perEmployee * t.employees) + '/month)'
-  }));
+  return window.NHR_SITE.signupTiers.map(t => {
+    const band = window.nhrPriceFor(t.employees);
+    return { value: t.label, label: t.label + (band ? ' (£' + band.monthly + '/month + VAT)' : ' (contact us)') };
+  });
 }
 
 function ModalField({ label, children }) {
@@ -148,7 +146,7 @@ function SignupModal() {
             </Button>
 
             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: '#8A9998' }}>
-              Prices shown are placeholder estimates. By continuing you agree to the Privacy Policy — no data leaves this demo.
+              Prices exclude VAT. By continuing you agree to the Privacy Policy — no data leaves this demo.
             </p>
           </form>
         )}

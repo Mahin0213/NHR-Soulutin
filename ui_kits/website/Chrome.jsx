@@ -266,6 +266,31 @@ function Footer() {
   );
 }
 
+/* ---------- pricing ---------- */
+function bandLabel(bands, i) {
+  const lo = i === 0 ? 1 : bands[i - 1].upTo + 1;
+  return lo === 1 ? 'Up to ' + bands[i].upTo + ' employees' : lo + '–' + bands[i].upTo + ' employees';
+}
+function goToContact() {
+  window.location.href = (window.NHR_ROUTES && window.NHR_ROUTES['contact.html']) || 'contact.html';
+}
+function PriceBands({ annual }) {
+  const { PricingCard } = window.NHRSolutionDesignSystem_0db691;
+  const P = window.NHR_SITE.pricing;
+  const above = P.bands[P.bands.length - 1].upTo + 1;
+  return (
+    <div className="grid-5 pricing" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 16, alignItems: 'stretch' }}>
+      {P.bands.map((b, i) => (
+        <PricingCard key={b.upTo} name={bandLabel(P.bands, i)} blurb="Every feature included."
+          price={'£' + (annual ? b.monthly * P.annualMonths : b.monthly).toLocaleString('en-GB')}
+          period={annual ? '/year' : '/month'} ctaLabel="Get Started" />
+      ))}
+      <PricingCard name={above + '+ employees'} blurb="A quote for larger teams." price="Contact us" period=""
+        ctaLabel="Contact Us" onSelect={goToContact} />
+    </div>
+  );
+}
+
 /* The published build defines nhrLoadAnalytics and gtag; the prototype does not,
    so this is a no-op when opened from ui_kits/. */
 function setAnalyticsConsent(granted) {
@@ -361,4 +386,4 @@ function SafeLink({ label, style, children, title }) {
   );
 }
 
-Object.assign(window, { useTheme, ThemeToggle, Wordmark, DotField, Glow, GridLines, Section, AnnouncementBar, Navbar, PageHero, Footer, CookieBanner, Page, footerHref, SafeLink, FOOTER_HREFS, siteUrl, pageUrl, JsonLd, setAnalyticsConsent });
+Object.assign(window, { useTheme, ThemeToggle, Wordmark, DotField, Glow, GridLines, Section, AnnouncementBar, Navbar, PageHero, Footer, CookieBanner, Page, footerHref, SafeLink, FOOTER_HREFS, siteUrl, pageUrl, JsonLd, setAnalyticsConsent, PriceBands, bandLabel, goToContact });

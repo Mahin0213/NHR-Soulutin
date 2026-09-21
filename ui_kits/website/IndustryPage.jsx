@@ -37,7 +37,7 @@ const INDUSTRIES = {
     faqs: [
       { q: 'Can it handle bank and agency staff?', a: 'Yes. Bank staff can be held as employment records with a casual or temporary type, and only appear on the rota when assigned to a shift.' },
       { q: 'Does it track mandatory training?', a: 'Training certificates are documents on the employee record with a category and expiry date, so renewals surface as reminders rather than surprises.' },
-      { q: 'Is it suitable for multiple sites?', a: 'Locations and branches are fields on the employee record, and rotas are built per site. Multi-site controls sit in the Business and Enterprise plans.' },
+      { q: 'Is it suitable for multiple sites?', a: 'Locations and branches are fields on the employee record, and rotas are built per site.' },
       { q: 'Does using NHR Solution make us compliant?', a: 'No software can do that. It keeps the records, dates and reminders that make demonstrating your compliance far easier, but the responsibility stays with you.' }
     ]
   }

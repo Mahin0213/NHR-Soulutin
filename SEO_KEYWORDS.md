@@ -171,7 +171,7 @@ All within limits: titles ≤ 60 characters, descriptions ≤ 160.
 | `index.html` | All-in-one HR, payroll, compliance and workforce software for UK businesses — employee records, payroll runs, rotas, absence and reporting in one place. | 154 |
 | `hr-software.html` | UK HR software for employee records, holiday and leave, absence, attendance, rotas, performance and documents — one workspace for people management. | 150 |
 | `payroll.html` | UK payroll software and managed payroll — gross-to-net pay runs, itemised payslips and cost reporting, driven by employee records you already keep. | 149 |
-| `pricing.html` | HR, payroll, health & safety and eLearning plans priced per employee. Estimate your monthly cost by headcount and compare every plan side by side. | 146 |
+| `pricing.html` | Simple UK HR software pricing: every feature included, from £40 a month for up to 5 employees. Monthly, excluding VAT, with two months free yearly. | 147 |
 | `calculators.html` | Free HR and payroll calculators: Bradford Factor, holiday entitlement, salary and take-home, hourly rate, notice period, employee cost, overtime and payroll. | 157 |
 | `industry-healthcare.html` | HR, rota and training software for healthcare and care services. Cover every shift, track mandatory training and keep inspection-ready employee records. | 152 |
 | `about.html` | About NHR Solution: why the platform was built, the decisions behind it, the modules it covers, and an honest account of what it does not yet claim. | 148 |

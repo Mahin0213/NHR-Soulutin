@@ -24,8 +24,8 @@ const { SectionHeading, Card, Button, Badge, IconWrapper } = window.NHRSolutionD
 
 const DEMO_DAY = 864e5;
 const INDUSTRIES = ['Healthcare', 'Construction', 'Hospitality', 'Retail', 'Logistics', 'Professional services', 'Care services', 'Education', 'Charity', 'Other'];
-const DEMO_BANDS = ['1–10', '11–50', '51–200', '201–500', '500+'];
-const BAND_MID = { '1–10': 8, '11–50': 30, '51–200': 120, '201–500': 350, '500+': 600 };
+const DEMO_BANDS = ['1–5', '6–10', '11–15', '16–20', '21+'];
+const BAND_TOP = { '1–5': 5, '6–10': 10, '11–15': 15, '16–20': 20, '21+': 21 };
 const SLOTS = ['09:30', '10:30', '11:30', '13:30', '14:30', '15:30', '16:30'];
 
 const DemoStore = (function () {
@@ -126,15 +126,12 @@ function DemoForm({ onBooked }) {
   const [booked, setBooked] = React.useState(null);
   const [f, setF] = React.useState({
     firstName: '', lastName: '', email: '', phone: '',
-    business: '', employees: '11–50', industry: 'Healthcare', role: '',
+    business: '', employees: '6–10', industry: 'Healthcare', role: '',
     interests: ['Employees', 'Leave'], date: '', time: '', message: '', consent: false
   });
 
   const days = React.useMemo(() => workingDays(15), []);
-  const pricing = window.NHR_SITE && window.NHR_SITE.pricing;
-  const pro = pricing && pricing.plans ? pricing.plans.find(p => p.featured) || pricing.plans[1] : null;
-  const headcount = BAND_MID[f.employees] || 30;
-  const estimate = pro ? Math.round((Number(pro.base) || 0) + (Number(pro.perEmployee) || 0) * headcount) : null;
+  const band = window.nhrPriceFor(BAND_TOP[f.employees] || 10);
 
   function set(patch) { setF(p => Object.assign({}, p, patch)); }
 
@@ -256,7 +253,7 @@ function DemoForm({ onBooked }) {
               <input value={f.business} onChange={e => set({ business: e.target.value })} autoComplete="organization" style={dstyle(errors.business)} />)}
             {dfield('Your role', false, 'So we pitch it at the right level.', null,
               <input value={f.role} onChange={e => set({ role: e.target.value })} placeholder="HR Manager" style={dstyle(false)} />)}
-            {dfield('Employees', false, 'Drives the estimate below.', null,
+            {dfield('Employees', false, 'Shows your price below.', null,
               <select value={f.employees} onChange={e => set({ employees: e.target.value })} style={dstyle(false)}>
                 {DEMO_BANDS.map(b => <option key={b} value={b}>{b}</option>)}
               </select>)}
@@ -266,16 +263,17 @@ function DemoForm({ onBooked }) {
               </select>)}
           </div>
 
-          {estimate != null && (
+          {(
             <div style={{
               display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', padding: 16, borderRadius: 14,
               background: 'var(--nhr-turquoise-tint)', border: '1px solid var(--nhr-turquoise-border)'
             }}>
               <Icon name="Calculator" size={18} style={{ flex: '0 0 auto', color: 'var(--nhr-turquoise-ink)' }} />
               <span style={{ flex: 1, minWidth: 200, fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-body)' }}>
-                Around <strong style={{ color: 'var(--text-heading)' }}>£{estimate.toLocaleString('en-GB')} a month</strong> on
-                {' '}{pro.name} at roughly {headcount} employees. You will get an exact figure on the call — and can check it
-                yourself on <a href="pricing.html" style={{ fontWeight: 700, color: 'var(--nhr-turquoise-ink)' }}>the pricing page</a>.
+                {band
+                  ? <React.Fragment><strong style={{ color: 'var(--text-heading)' }}>£{band.monthly} a month</strong> plus VAT for {f.employees} employees, with every feature included. </React.Fragment>
+                  : <React.Fragment>Teams of 21 or more get a quote, which we can cover on the call. </React.Fragment>}
+                See all prices on <a href="pricing.html" style={{ fontWeight: 700, color: 'var(--nhr-turquoise-ink)' }}>the pricing page</a>.
               </span>
             </div>
           )}

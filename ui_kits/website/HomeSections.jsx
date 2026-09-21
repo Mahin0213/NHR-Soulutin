@@ -335,18 +335,13 @@ function PricingPreview() {
   const P = window.NHR_SITE.pricing;
   return (
     <Section subtle id="pricing-preview">
-      <SectionHeading align="center" eyebrow="Pricing" title="Simple Plans. Powerful Tools."
-        description="Estimates based on a 25-employee business. Use the calculator on the pricing page for your own headcount." />
-      <div className="grid-4 pricing" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20, marginTop: 48, alignItems: 'stretch' }}>
-        {P.plans.map(p => (
-          <PricingCard key={p.name} name={p.name} blurb={p.blurb}
-            price={p.price ? p.price : '£' + Math.round(p.base + p.perEmployee * 25)}
-            period={p.price ? '' : '/month'} featured={p.featured}
-            ctaLabel={p.ctaLabel} features={p.features.slice(0, 4)} />
-        ))}
+      <SectionHeading align="center" eyebrow="Pricing" title="Simple Pricing. Every Feature Included."
+        description={'One plan, priced by team size — from £' + P.bands[0].monthly + ' a month. Prices exclude VAT.'} />
+      <div style={{ marginTop: 48 }}>
+        <PriceBands annual={false} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
-        <Button variant="secondary" iconRight={<Icon name="ArrowRight" size={18} />}>Compare All Plans</Button>
+        <Button href="pricing.html" variant="secondary" iconRight={<Icon name="ArrowRight" size={18} />}>See Full Pricing</Button>
       </div>
     </Section>
   );

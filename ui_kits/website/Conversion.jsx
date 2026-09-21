@@ -1,31 +1,5 @@
 const { SectionHeading, PricingCard, TestimonialCard, FaqItem, Button, Switch, Input, Select, Card } = window.NHRSolutionDesignSystem_0db691;
 
-function Pricing() {
-  const D = window.NHR_SITE;
-  const [annual, setAnnual] = React.useState(false);
-  const priceFor = (p) => {
-    if (!p.price.startsWith('£')) return p.price;
-    const n = parseInt(p.price.slice(1), 10);
-    return '£' + (annual ? Math.round(n * 10) : n);
-  };
-  return (
-    <Section id="pricing">
-      <SectionHeading align="center" eyebrow="Pricing" title="Simple Plans. Powerful Tools."
-        description="Start with what you need today. Prices shown are placeholders while plans are finalised." />
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
-        <Switch label={annual ? 'Annual billing (2 months free)' : 'Annual billing'} checked={annual} onChange={e => setAnnual(e.target.checked)} />
-      </div>
-      <div className="grid-3 pricing" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 44, alignItems: 'stretch' }}>
-        {D.plans.map(p => (
-          <PricingCard key={p.name} name={p.name} blurb={p.blurb} price={priceFor(p)}
-            period={p.period ? (annual ? '/year' : p.period) : ''} featured={p.featured}
-            ctaLabel={p.ctaLabel || 'Get Started'} features={p.features} />
-        ))}
-      </div>
-    </Section>
-  );
-}
-
 function Testimonials() {
   const D = window.NHR_SITE;
   return (
@@ -42,8 +16,13 @@ function Testimonials() {
 function Faq() {
   const D = window.NHR_SITE;
   const [open, setOpen] = React.useState(0);
+  const schema = {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: D.faqs.map(q => ({ '@type': 'Question', name: q.q, acceptedAnswer: { '@type': 'Answer', text: q.a } }))
+  };
   return (
     <Section>
+      <JsonLd data={schema} />
       <div style={{ maxWidth: 880, margin: '0 auto' }}>
         <SectionHeading align="center" eyebrow="FAQ" title="Questions, Answered" />
         <div style={{ marginTop: 40 }}>
@@ -101,4 +80,4 @@ function FinalCta() {
   );
 }
 
-Object.assign(window, { Pricing, Testimonials, Faq, ContactBlock, FinalCta });
+Object.assign(window, { Testimonials, Faq, ContactBlock, FinalCta });
