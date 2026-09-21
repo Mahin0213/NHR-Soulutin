@@ -266,10 +266,25 @@ function Footer() {
   );
 }
 
+/* The published build defines nhrLoadAnalytics and gtag; the prototype does not,
+   so this is a no-op when opened from ui_kits/. */
+function setAnalyticsConsent(granted) {
+  if (granted) {
+    if (window.nhrLoadAnalytics) window.nhrLoadAnalytics();
+    return;
+  }
+  if (typeof window.gtag === 'function') window.gtag('consent', 'update', { analytics_storage: 'denied' });
+  const host = location.hostname.replace(/^www\./, '');
+  document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(n => /^_ga/.test(n)).forEach(n => {
+    document.cookie = n + '=; Max-Age=0; path=/';
+    document.cookie = n + '=; Max-Age=0; path=/; domain=.' + host;
+  });
+}
+
 function CookieBanner() {
   const [open, setOpen] = React.useState(() => localStorage.getItem('nhr-cookies') === null);
   if (!open) return null;
-  const close = (v) => { localStorage.setItem('nhr-cookies', v); setOpen(false); };
+  const close = (v) => { localStorage.setItem('nhr-cookies', v); setAnalyticsConsent(v === 'all'); setOpen(false); };
   return (
     <div role="dialog" aria-label="Cookie preferences" style={{
       position: 'fixed', bottom: 20, left: 20, right: 20, zIndex: 60, maxWidth: 560, margin: '0 auto',
@@ -346,4 +361,4 @@ function SafeLink({ label, style, children, title }) {
   );
 }
 
-Object.assign(window, { useTheme, ThemeToggle, Wordmark, DotField, Glow, GridLines, Section, AnnouncementBar, Navbar, PageHero, Footer, CookieBanner, Page, footerHref, SafeLink, FOOTER_HREFS, siteUrl, pageUrl, JsonLd });
+Object.assign(window, { useTheme, ThemeToggle, Wordmark, DotField, Glow, GridLines, Section, AnnouncementBar, Navbar, PageHero, Footer, CookieBanner, Page, footerHref, SafeLink, FOOTER_HREFS, siteUrl, pageUrl, JsonLd, setAnalyticsConsent });

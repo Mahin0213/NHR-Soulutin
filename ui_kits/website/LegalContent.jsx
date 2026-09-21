@@ -41,7 +41,7 @@ const LEGAL_DOCS = {
       ['What we collect from website visitors', [
         'Contact and demo enquiries: your name, email address, telephone number if you give one, business name, employee-count band, sector, and what you wrote in the message. We collect these because you asked us to reply.',
         'Trial sign-ups: the same, plus the plan you selected.',
-        'Technical information: pages visited, approximate location derived from IP address, browser and device type. Used to keep the service working and to understand which pages are useful.',
+        'Technical information: pages visited, approximate location derived from IP address, browser and device type. Used to keep the service working and to understand which pages are useful. Page-visit measurement uses Google Analytics, and only if you accept optional cookies — see the cookie policy.',
         'We do not buy contact lists, and we do not add enquirers to marketing email unless they ask to be added.'
       ]],
       ['Employee data held in the platform', [
@@ -50,12 +50,13 @@ const LEGAL_DOCS = {
         'Wellbeing check-in responses carry no employee identifier by design. There is no technical route from a response back to a person, which is why team results are withheld below a minimum number of responses.'
       ]],
       ['Lawful basis', [
-        'For website enquiries we rely on legitimate interests — you contacted us and expect a reply — and on consent where you have asked for marketing.',
+        'For website enquiries we rely on legitimate interests — you contacted us and expect a reply — and on consent where you have asked for marketing. Website analytics rely on consent, which you can withdraw at any time from the cookie policy.',
         'For employee data in the platform, the lawful basis is the customer\'s to determine as controller. In most cases it will be performance of the employment contract, compliance with a legal obligation such as PAYE and working-time records, or legitimate interests.',
         'Where a customer processes staff data through an AI feature, they should record their own lawful basis for doing so. Our assistant is given aggregate figures only; it is never given individual records, notes, or absence reasons.'
       ]],
       ['Who we share data with', [
         'Sub-processors: hosting, email delivery, error monitoring and payment processing. A current list is available on request, and we will give notice before adding or replacing one.',
+        'Website analytics: Google, which provides Google Analytics, receives page-visit data from visitors who have accepted optional cookies.',
         'We do not sell personal data. We do not share it for advertising.',
         'We disclose data where we are legally required to, and will tell the controller unless prohibited from doing so.'
       ]],
@@ -139,14 +140,14 @@ const LEGAL_DOCS = {
     intro: 'What this website and the platform store on your device, and how to change it.',
     sections: [
       ['The short version', [
-        'This prototype sets no advertising or tracking cookies. What it stores is functional: what you have dismissed, which theme you chose, and — in the platform demo — the demo data itself so your changes survive a page refresh.',
+        'This site sets no advertising cookies. It uses Google Analytics only if you accept optional cookies; otherwise what it stores is functional: what you have dismissed, which theme you chose, and — in the platform demo — the demo data itself so your changes survive a page refresh.',
         'Under the Privacy and Electronic Communications Regulations, strictly necessary storage does not need consent. Anything else does, and must be off until you agree.'
       ]],
       ['What is stored', [
         'Strictly necessary: your cookie choice itself, your signed-in session in the platform, and the security token that protects form submissions. Without these the service cannot work.',
         'Functional: the light or dark theme you picked, whether you dismissed the announcement bar, and which article votes you have cast so you are not asked twice.',
         'Demo data: the platform prototype keeps its example employee, leave, payroll and safety records in your browser rather than on a server. Clearing site data resets the demo and loses anything you entered — it is not stored anywhere else.',
-        'Analytics: none set in this prototype. If analytics are added, this policy will name the provider and the storage before they are switched on.'
+        'Analytics (optional): Google Analytics 4, provided by Google, measures which pages are visited and how people move through the site. It sets the _ga and _ga_<ID> cookies and is not loaded at all until you choose Accept All. Choosing Reject Non-Essential, or clearing your preferences, switches it off and removes those cookies.'
       ]],
       ['Changing your mind', [
         'Use the controls below to see and change what is stored. You can also clear everything from your browser settings.',
@@ -271,15 +272,18 @@ function CookieControls() {
     ['nhr-employees-v1', 'Demo data', 'Example employee records for the platform prototype.'],
     ['nhr-support-v1', 'Demo data', 'Help articles, your article votes and demo tickets.'],
     ['nhr-enquiries-v1', 'Demo data', 'Contact enquiries submitted in this prototype.'],
-    ['nhr-demos-v1', 'Demo data', 'Demo bookings made in this prototype.']
+    ['nhr-demos-v1', 'Demo data', 'Demo bookings made in this prototype.'],
+    ['_ga', 'Analytics (optional)', 'Google Analytics visitor identifier. Only set after you accept.']
   ];
 
   function present(k) {
+    if (k === '_ga') return /(^|; )_ga/.test(document.cookie);
     try { return localStorage.getItem(k) !== null || sessionStorage.getItem(k) !== null; } catch (e) { return false; }
   }
 
   function setPref(v) {
     localStorage.setItem('nhr-cookies', v);
+    setAnalyticsConsent(v === 'accepted');
     setChoice(v);
     setCleared(false);
     /* Rejecting non-essential means actually removing the functional keys, not
@@ -305,6 +309,7 @@ function CookieControls() {
         <Button size="sm" variant="secondary" onClick={() => setPref('rejected')}>Reject Non-Essential</Button>
         <Button size="sm" variant="ghost" onClick={() => {
           try { localStorage.removeItem('nhr-cookies'); localStorage.removeItem('nhr-theme'); sessionStorage.removeItem('nhr-ann'); } catch (e) { /* ignore */ }
+          setAnalyticsConsent(false);
           setChoice(null); setCleared(true);
         }}>Clear My Preferences</Button>
       </div>

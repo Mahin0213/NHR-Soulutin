@@ -1,6 +1,7 @@
 {
   "site": "https://nhrsolutions.net",
   "sourceDir": "ui_kits/website",
+  "gaId": "G-B66G83YGNE",
   "routes": [
     {"file": "index.html", "path": "/", "priority": "1.0", "changefreq": "weekly"},
     {"file": "hr-software.html", "path": "/hr-software/", "priority": "0.9", "changefreq": "monthly"},
