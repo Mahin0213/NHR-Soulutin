@@ -7,6 +7,13 @@
       "runtimeArgs": ["http-server", "-c-1", "."],
       "port": 4173,
       "autoPort": true
+    },
+    {
+      "name": "dist",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "-c-1", "dist"],
+      "port": 4180,
+      "autoPort": true
     }
   ]
 }

@@ -169,9 +169,34 @@ function Navbar({ current = 'Home', theme, onToggleTheme, solid = false }) {
 }
 
 /* ---------- page hero for inner pages ---------- */
+/* ---------- structured data ----------
+   Absolute URL for a site link. On the published site NHR_ROUTES maps source
+   files to clean addresses; the prerender build rewrites anything left pointing
+   at its local server. */
+function siteUrl(href) {
+  const u = new URL(href, document.baseURI);
+  const m = u.pathname.match(/\/ui_kits\/website\/([a-z0-9-]+\.html)$/);
+  const clean = window.NHR_ROUTES && m && window.NHR_ROUTES[m[1]];
+  return clean ? location.origin + clean : u.origin + u.pathname;
+}
+function pageUrl() {
+  return window.NHR_ROUTES ? location.origin + location.pathname : siteUrl(location.pathname);
+}
+function JsonLd({ data }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+}
+function breadcrumbSchema(crumbs) {
+  const items = crumbs
+    .map((c, i) => ({ c, last: i === crumbs.length - 1 }))
+    .filter(({ c, last }) => last || (c.href && c.href !== '#'))
+    .map(({ c, last }, i) => ({ '@type': 'ListItem', position: i + 1, name: c.label, item: last ? pageUrl() : siteUrl(c.href) }));
+  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
+}
+
 function PageHero({ eyebrow, title, highlight, description, primary = 'Get Started', secondary = 'Book a Demo', children, breadcrumbs }) {
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--nhr-black)' }}>
+      {breadcrumbs && <JsonLd data={breadcrumbSchema(breadcrumbs)} />}
       <DotField size={280} opacity={.38} inset={-110} />
       <DotField corner="br" size={260} opacity={.3} inset={-60} />
       <GridLines />
@@ -321,4 +346,4 @@ function SafeLink({ label, style, children, title }) {
   );
 }
 
-Object.assign(window, { useTheme, ThemeToggle, Wordmark, DotField, Glow, GridLines, Section, AnnouncementBar, Navbar, PageHero, Footer, CookieBanner, Page, footerHref, SafeLink, FOOTER_HREFS });
+Object.assign(window, { useTheme, ThemeToggle, Wordmark, DotField, Glow, GridLines, Section, AnnouncementBar, Navbar, PageHero, Footer, CookieBanner, Page, footerHref, SafeLink, FOOTER_HREFS, siteUrl, pageUrl, JsonLd });

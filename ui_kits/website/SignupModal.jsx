@@ -174,9 +174,10 @@ function useSignupCtaBinding() {
       const demo = text.indexOf('demo') > -1 || text.indexOf('sales') > -1;
       /* A demo CTA now has a real page to go to, so send it there rather than
          collecting the same details twice in a modal. */
-      if (demo && !/demo\.html$/.test(window.location.pathname)) {
-        const base = /\/website\//.test(window.location.pathname) ? 'demo.html' : 'ui_kits/website/demo.html';
-        window.location.href = base;
+      const demoUrl = (window.NHR_ROUTES && window.NHR_ROUTES['demo.html']) || '/ui_kits/website/demo.html';
+      const onDemoPage = /demo\.html$/.test(window.location.pathname) || window.location.pathname === demoUrl;
+      if (demo && !onDemoPage) {
+        window.location.href = demoUrl;
         return;
       }
       window.dispatchEvent(new CustomEvent('nhr-signup', { detail: { mode: demo ? 'demo' : 'trial' } }));

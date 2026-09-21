@@ -1,7 +1,7 @@
 /* HR calculators. Every formula below is standard UK practice and is
    implemented exactly — no rounding shortcuts. Figures the user enters are
    never sent anywhere. */
-const { SectionHeading, Card, Button, Badge, IconWrapper } = window.NHRSolutionDesignSystem_0db691;
+const { SectionHeading, Card, Button, Badge, IconWrapper, FaqItem } = window.NHRSolutionDesignSystem_0db691;
 
 const gbp = n => '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const gbp0 = n => '£' + Math.round(Number(n)).toLocaleString('en-GB');
@@ -397,16 +397,158 @@ function PayrollCalc() {
   );
 }
 
+/* One page per calculator. Copy restates the formulas and notes above; rates
+   named here must change together with the constants in each calculator. */
 const CALCULATORS = [
-  { id: 'bradford', name: 'Bradford Factor', icon: 'Activity' },
-  { id: 'holiday', name: 'Holiday Entitlement', icon: 'Plane' },
-  { id: 'salary', name: 'Salary & Take-Home', icon: 'Wallet' },
-  { id: 'hourly', name: 'Hourly Rate', icon: 'Clock' },
-  { id: 'notice', name: 'Notice Period', icon: 'CalendarClock' },
-  { id: 'cost', name: 'Employee Cost', icon: 'Users' },
-  { id: 'overtime', name: 'Overtime', icon: 'Timer' },
-  { id: 'payroll', name: 'Payroll', icon: 'Banknote' }
+  {
+    id: 'bradford', file: 'calc-bradford-factor.html', name: 'Bradford Factor', icon: 'Activity', Calc: BradfordCalc,
+    blurb: 'Score absence patterns with the S² × D formula.',
+    intro: 'Work out an employee’s Bradford Factor score from the number of absence spells and total days absent. Free, instant, and nothing you enter leaves your browser.',
+    about: [
+      'The Bradford Factor scores absence so that frequent short absences weigh more than one long one. The score is S² × D: the number of separate absence spells, squared, multiplied by the total days absent in the period — usually a rolling 12 months.',
+      'Squaring the spell count is the whole point. One absence of ten days scores 1 × 1 × 10 = 10. Five separate two-day absences — the same ten days — score 5 × 5 × 10 = 250.',
+      'Treat the score as a prompt for a conversation, not a verdict. A disability or long-term condition can cause frequent short absences, so acting on the score alone carries a discrimination risk.'
+    ],
+    faqs: [
+      { q: 'How is the Bradford Factor calculated?', a: 'Square the number of separate absence spells (S) and multiply by the total days absent (D): S² × D. Four spells totalling seven days gives 4 × 4 × 7 = 112.' },
+      { q: 'What is a high Bradford Factor score?', a: 'Trigger points are set by each employer’s absence policy. Common thresholds are 150, 450 and 900, but they should prompt a conversation rather than an automatic sanction.' },
+      { q: 'What counts as one absence spell?', a: 'Each unbroken period of absence counts as one spell, however many days it lasts.' },
+      { q: 'Can the Bradford Factor be discriminatory?', a: 'It can be if used without judgement. A disability or health condition may cause frequent short absences and a high score, so the score alone should never be grounds for action.' }
+    ]
+  },
+  {
+    id: 'holiday', file: 'calc-holiday-entitlement.html', name: 'Holiday Entitlement', icon: 'Plane', Calc: HolidayCalc,
+    blurb: 'Statutory paid holiday in days or hours, pro-rated.',
+    intro: 'Calculate statutory minimum paid holiday for full-time, part-time and part-year workers, in days or hours.',
+    about: [
+      'UK workers are entitled to 5.6 weeks of paid holiday a year. For someone working five days a week that is 28 days, which is also the statutory cap — working six days a week does not raise the minimum above 28.',
+      'Part-time workers get the same 5.6 weeks, pro rata: three days a week gives 3 × 5.6 = 16.8 days. Someone who joins or leaves part-way through the holiday year gets a proportion of the full-year figure.',
+      'Workers with irregular hours, and part-year workers, accrue holiday at 12.07% of the hours they work instead (5.6 weeks ÷ 46.4 working weeks). This calculator covers fixed working patterns.'
+    ],
+    faqs: [
+      { q: 'How much holiday is a full-time employee entitled to?', a: '5.6 weeks a year. For a five-day week that is 28 days, which is the statutory maximum even for people who work more days.' },
+      { q: 'How is holiday calculated for part-time workers?', a: 'Days worked per week × 5.6. Three days a week gives 16.8 days of paid holiday a year.' },
+      { q: 'Are bank holidays included?', a: 'There is no statutory right to paid bank holidays on top of the 5.6 weeks. Employers can count them towards the minimum, and many contracts give more — check the contract.' },
+      { q: 'How is holiday worked out for irregular hours?', a: 'Irregular-hours and part-year workers accrue 12.07% of the hours they work in each pay period.' }
+    ]
+  },
+  {
+    id: 'salary', file: 'calc-take-home-pay.html', name: 'Take-Home Pay', icon: 'Wallet', Calc: SalaryCalc,
+    blurb: 'Salary after income tax, NI and pension.',
+    intro: 'See estimated take-home pay after income tax, employee National Insurance and pension, per year and per month.',
+    about: [
+      'Pension is deducted first, as a net pay arrangement. Income tax is then applied band by band to what remains above the personal allowance, and employee National Insurance is charged on gross pay.',
+      'The calculator uses 2025/26 rates for England and Northern Ireland: a £12,570 personal allowance that tapers away above £100,000, 20% to £50,270, 40% to £125,140 and 45% above. Employee NI is 8% between £12,570 and £50,270, then 2%.',
+      'Scotland sets its own income tax bands, so results for Scottish taxpayers will differ. Student loans and other deductions are not included.'
+    ],
+    faqs: [
+      { q: 'How is take-home pay calculated?', a: 'Gross salary minus pension contributions, income tax and employee National Insurance. Tax is charged band by band on pay above the personal allowance.' },
+      { q: 'What personal allowance does the calculator use?', a: '£12,570, the 2025/26 figure. It reduces by £1 for every £2 of income above £100,000.' },
+      { q: 'Does this work for Scotland?', a: 'No — Scotland has different income tax bands. National Insurance is the same across the UK.' },
+      { q: 'Is pension taken before tax?', a: 'The calculator assumes a net pay arrangement, where pension contributions are deducted before income tax is worked out.' }
+    ]
+  },
+  {
+    id: 'hourly', file: 'calc-hourly-rate.html', name: 'Hourly Rate', icon: 'Clock', Calc: HourlyCalc,
+    blurb: 'Convert an annual salary to an hourly rate.',
+    intro: 'Turn an annual salary into an hourly, daily and weekly rate, and check it against the National Living Wage.',
+    about: [
+      'The hourly rate is the annual salary divided by the hours paid across the year: contracted hours per week multiplied by paid weeks. Use 52 weeks when paid holiday is included in the salary.',
+      'The result is compared with the National Living Wage of £12.21 an hour for workers aged 21 and over, which applied from April 2025. Rates change every April, and lower rates apply to younger workers and apprentices.'
+    ],
+    faqs: [
+      { q: 'How do I convert a salary to an hourly rate?', a: 'Divide the annual salary by hours per week × paid weeks per year. £32,000 at 37.5 hours over 52 weeks is £16.41 an hour.' },
+      { q: 'How many paid weeks should I use?', a: '52 if the salary includes paid holiday, which is usual for salaried staff.' },
+      { q: 'Does the calculator check the minimum wage?', a: 'It compares the result with the April 2025 National Living Wage for workers aged 21 and over. Rates change each April, so confirm the current figure on GOV.UK.' }
+    ]
+  },
+  {
+    id: 'notice', file: 'calc-notice-period.html', name: 'Notice Period', icon: 'CalendarClock', Calc: NoticeCalc,
+    blurb: 'Statutory minimum notice by length of service.',
+    intro: 'Find the statutory minimum notice an employer must give, based on an employee’s continuous service.',
+    about: [
+      'UK law sets a minimum notice period based on continuous service: none under one month, one week from one month to under two years, then one week for each complete year of service, up to twelve weeks.',
+      'An employee with at least a month’s service must give at least one week’s notice. Contracts often set longer notice, and the longer period applies. Statutory notice does not apply where someone is dismissed for gross misconduct.'
+    ],
+    faqs: [
+      { q: 'What is the statutory notice period in the UK?', a: 'One week after one month’s service, then one week per complete year once someone has two years’ service, capped at twelve weeks.' },
+      { q: 'How much notice does an employee have to give?', a: 'At least one week once they have worked for a month, unless their contract says more.' },
+      { q: 'Does the contract override statutory notice?', a: 'A contractual notice period applies if it is longer than the statutory minimum. It cannot be shorter.' },
+      { q: 'Is notice required for gross misconduct?', a: 'No — statutory notice does not apply to a dismissal for gross misconduct.' }
+    ]
+  },
+  {
+    id: 'cost', file: 'calc-employee-cost.html', name: 'Employee Cost', icon: 'Users', Calc: EmployeeCostCalc,
+    blurb: 'The true cost of an employee to your business.',
+    intro: 'Work out the full annual cost of an employee: salary plus employer National Insurance, pension and other costs.',
+    about: [
+      'An employee costs more than their salary. The employer also pays National Insurance — 15% on earnings above the £5,000 secondary threshold in 2025/26 — and pension contributions, with an auto-enrolment minimum of 3% of qualifying earnings above £6,240.',
+      'Add equipment, training, benefits and software licences to see the full figure. Eligible employers can claim the Employment Allowance, which reduces the employer NI bill; the calculator does not apply it.'
+    ],
+    faqs: [
+      { q: 'How much does an employee cost on top of salary?', a: 'Employer National Insurance, employer pension contributions and other costs such as equipment and training. The calculator shows the total and the uplift over salary.' },
+      { q: 'What employer National Insurance rate is used?', a: '15% on earnings above the £5,000 secondary threshold, the 2025/26 rate.' },
+      { q: 'What is the minimum employer pension contribution?', a: 'Under auto-enrolment, employers must contribute at least 3% of qualifying earnings.' },
+      { q: 'Is the Employment Allowance included?', a: 'No. The result is the cost before any Employment Allowance, which eligible employers can use to reduce their NI bill.' }
+    ]
+  },
+  {
+    id: 'overtime', file: 'calc-overtime.html', name: 'Overtime Pay', icon: 'Timer', Calc: OvertimeCalc,
+    blurb: 'Pay at time-and-a-half, double time and more.',
+    intro: 'Calculate overtime pay at standard rate, time-and-a-quarter, time-and-a-half or double time.',
+    about: [
+      'Overtime pay is the hourly rate multiplied by the overtime multiplier and the hours worked. At £14.50 an hour, six hours at time-and-a-half is £14.50 × 1.5 × 6 = £130.50.',
+      'There is no statutory right to a premium overtime rate in the UK — the rate depends on the contract. Average pay across all hours worked must not fall below the National Minimum Wage.'
+    ],
+    faqs: [
+      { q: 'How is overtime pay calculated?', a: 'Hourly rate × overtime multiplier × overtime hours.' },
+      { q: 'What is time and a half?', a: '1.5 times the standard hourly rate. Double time is twice the standard rate.' },
+      { q: 'Do employers have to pay extra for overtime?', a: 'Not by law. Premium rates depend on the contract, but average pay must stay at or above the National Minimum Wage.' }
+    ]
+  },
+  {
+    id: 'payroll', file: 'calc-payroll-cost.html', name: 'Payroll Cost', icon: 'Banknote', Calc: PayrollCalc,
+    blurb: 'Annual and monthly payroll cost for a team.',
+    intro: 'Estimate the annual and monthly payroll cost of a whole team, including employer National Insurance and pension.',
+    about: [
+      'Each employee costs their salary, plus employer National Insurance at 15% above £5,000, plus employer pension on qualifying earnings above £6,240. The calculator applies those to an average salary across the team.',
+      'It is a planning estimate. Real payroll varies with individual salaries, tax codes, benefits and Employment Allowance eligibility.'
+    ],
+    faqs: [
+      { q: 'How do I estimate payroll cost?', a: 'Multiply headcount by average salary, then add employer National Insurance and pension contributions. The calculator does this for you.' },
+      { q: 'Why use an average salary?', a: 'It gives a quick budget figure. NI and pension thresholds apply per person, so a team with very uneven salaries will differ from the estimate.' },
+      { q: 'Does it include the Employment Allowance?', a: 'No. Eligible employers can reduce their NI bill with the Employment Allowance.' }
+    ]
+  }
 ];
+
+function CalcDisclaimer() {
+  return (
+    <div style={{
+      marginTop: 32, padding: '18px 20px', display: 'flex', gap: 12, alignItems: 'flex-start',
+      border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', background: 'var(--surface-subtle)'
+    }}>
+      <Icon name="Info" size={17} style={{ color: 'var(--text-accent)', marginTop: 2 }} />
+      <span style={{ fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-body)' }}>
+        These calculators use 2025/26 UK rates for England and Northern Ireland and are provided for guidance only. They are not tax, legal or financial advice — check figures against HMRC guidance or your accountant before acting on them. Scotland operates different income tax bands.
+      </span>
+    </div>
+  );
+}
+
+function CalcCard({ c }) {
+  return (
+    <a href={c.file} style={{
+      display: 'flex', flexDirection: 'column', gap: 10, padding: '20px 22px', height: '100%', boxSizing: 'border-box',
+      background: 'var(--surface-card)', border: '1px solid var(--border-subtle)',
+      borderRadius: 'var(--radius-md)', textDecoration: 'none'
+    }}>
+      <Icon name={c.icon} size={20} style={{ color: 'var(--text-accent)' }} />
+      <span style={{ fontSize: 15.5, fontWeight: 700, color: 'var(--text-heading)' }}>{c.name} Calculator</span>
+      <span style={{ fontSize: 13.5, lineHeight: 1.55, color: 'var(--text-body)' }}>{c.blurb}</span>
+    </a>
+  );
+}
 
 function CalculatorsBody() {
   return (
@@ -414,36 +556,67 @@ function CalculatorsBody() {
       <PageHero eyebrow="Free Tools" title="HR Calculators That" highlight="Do The Maths For You"
         description="Eight everyday HR and payroll calculations, worked correctly and explained. Nothing you type is sent anywhere."
         primary="Get Started" secondary="Book a Demo"
-        breadcrumbs={[{ label: 'Home', href: 'index.html' }, { label: 'Resources', href: 'resources.html' }, { label: 'Calculators' }]} />
+        breadcrumbs={[{ label: 'Home', href: 'index.html' }, { label: 'Calculators' }]} />
+
+      <Section>
+        <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+          {CALCULATORS.map(c => <CalcCard key={c.id} c={c} />)}
+        </div>
+        <CalcDisclaimer />
+      </Section>
+
+      <DemoCta />
+    </React.Fragment>
+  );
+}
+
+function CalculatorPage({ id }) {
+  const c = CALCULATORS.find(x => x.id === id);
+  const Calc = c.Calc;
+  const [open, setOpen] = React.useState(0);
+  const app = {
+    '@context': 'https://schema.org', '@type': 'WebApplication',
+    name: c.name + ' Calculator', url: pageUrl(), description: c.intro,
+    applicationCategory: 'BusinessApplication', operatingSystem: 'Any', isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+    publisher: { '@type': 'Organization', name: 'NHR Solution', url: siteUrl('index.html') }
+  };
+  const faq = {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: c.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } }))
+  };
+  return (
+    <React.Fragment>
+      <JsonLd data={app} />
+      <JsonLd data={faq} />
+      <PageHero eyebrow="Free calculator" title={c.name} highlight="Calculator" description={c.intro} primary=""
+        breadcrumbs={[{ label: 'Home', href: 'index.html' }, { label: 'Calculators', href: 'calculators.html' }, { label: c.name }]} />
 
       <Section subtle>
-        <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
-          {CALCULATORS.map(c => (
-            <a key={c.id} href={'#' + c.id} style={{
-              display: 'flex', alignItems: 'center', gap: 12, padding: '15px 17px',
-              background: 'var(--surface-card)', border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)', textDecoration: 'none'
-            }}>
-              <Icon name={c.icon} size={18} style={{ color: 'var(--text-accent)' }} />
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-heading)' }}>{c.name}</span>
-            </a>
-          ))}
-        </div>
+        <Calc />
+        <CalcDisclaimer />
       </Section>
 
       <Section>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <BradfordCalc /><HolidayCalc /><SalaryCalc /><HourlyCalc />
-          <NoticeCalc /><EmployeeCostCalc /><OvertimeCalc /><PayrollCalc />
+        <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <SectionHeading eyebrow="How it works" title={'About The ' + c.name + ' Calculator'} />
+          {c.about.map(p => <p key={p.slice(0, 24)} style={{ margin: 0, fontSize: 'var(--text-body-md)', lineHeight: 1.7, color: 'var(--text-body)' }}>{p}</p>)}
+          <div style={{ marginTop: 28 }}>
+            <SectionHeading eyebrow="FAQ" title="Questions, Answered" />
+          </div>
+          <div>
+            {c.faqs.map((f, i) => (
+              <FaqItem key={f.q} id={'cfaq-' + i} question={f.q} answer={f.a}
+                open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
+            ))}
+          </div>
         </div>
-        <div style={{
-          marginTop: 32, padding: '18px 20px', display: 'flex', gap: 12, alignItems: 'flex-start',
-          border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', background: 'var(--surface-subtle)'
-        }}>
-          <Icon name="Info" size={17} style={{ color: 'var(--text-accent)', marginTop: 2 }} />
-          <span style={{ fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-body)' }}>
-            These calculators use 2025/26 UK rates for England and Northern Ireland and are provided for guidance only. They are not tax, legal or financial advice — check figures against HMRC guidance or your accountant before acting on them. Scotland operates different income tax bands.
-          </span>
+      </Section>
+
+      <Section subtle>
+        <SectionHeading eyebrow="More free tools" title="Other HR Calculators" />
+        <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginTop: 32 }}>
+          {CALCULATORS.filter(x => x.id !== id).map(x => <CalcCard key={x.id} c={x} />)}
         </div>
       </Section>
 
@@ -452,4 +625,4 @@ function CalculatorsBody() {
   );
 }
 
-Object.assign(window, { CalculatorsBody, CALCULATORS, incomeTax, employeeNI, BradfordCalc, HolidayCalc, SalaryCalc, HourlyCalc, NoticeCalc, EmployeeCostCalc, OvertimeCalc, PayrollCalc });
+Object.assign(window, { CalculatorsBody, CalculatorPage, CALCULATORS, incomeTax, employeeNI, BradfordCalc, HolidayCalc, SalaryCalc, HourlyCalc, NoticeCalc, EmployeeCostCalc, OvertimeCalc, PayrollCalc });
