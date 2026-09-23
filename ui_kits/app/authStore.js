@@ -74,10 +74,16 @@
       return Date.now() > s.trialStartedAt + TRIAL_DAYS * DAY;
     },
 
-    /* --- entry points --- */
+    /* --- entry points ---
+       signUp and signIn talk to Supabase Auth, so an account created on one
+       device opens on any other. The local record below is a cache for the UI;
+       the account itself lives on the server. Both return promises.
+
+       Without Supabase configured they fall back to the old local-only
+       behaviour, so the prototype still runs from a file. */
     signUp(form) {
       const name = [form.firstName, form.lastName].filter(Boolean).join(' ');
-      return write({
+      const cache = (extra) => write(Object.assign({
         mode: 'trial',
         plan: form.plan || 'Professional',
         name, initials: initials(name),
@@ -86,20 +92,109 @@
         role: 'Super Admin',
         trialStartedAt: Date.now(),
         createdAt: new Date().toISOString()
+      }, extra || {}));
+
+      const sb = window.NHRSupabase;
+      if (!sb || !sb.enabled()) return Promise.resolve(cache());
+
+      return sb.signUpAccount({
+        email: form.email,
+        password: form.password,
+        admin_name: name,
+        company_name: form.business,
+        employee_band: form.employees ? String(form.employees) : null,
+        sector: form.sector || null
+      })
+        .then(result => sb.signIn(form.email, form.password).then(user => ({ result, user })))
+        .then(({ result, user }) => cache({
+          userId: user.id,
+          tenantId: result.tenant_id,
+          trialEndsAt: result.trial_ends_at
+        }));
+    },
+
+    signIn(email, password) {
+      const fallback = () => {
+        const local = String(email || '').split('@')[0].replace(/[._-]+/g, ' ').trim();
+        const name = local.replace(/\b\w/g, c => c.toUpperCase()) || 'Account Owner';
+        return write({
+          mode: 'paid', plan: 'Professional',
+          name, initials: initials(name), email,
+          business: 'Your Business', role: 'Super Admin',
+          createdAt: new Date().toISOString()
+        });
+      };
+
+      const sb = window.NHRSupabase;
+      if (!sb || !sb.enabled()) return Promise.resolve(fallback());
+
+      return sb.signIn(email, password).then(user => {
+        const name = (user.user_metadata && user.user_metadata.name) || email.split('@')[0];
+        const s = write({
+          mode: 'paid', plan: 'Professional',
+          name, initials: initials(name), email: user.email,
+          business: 'Your Business', role: 'Super Admin',
+          userId: user.id,
+          createdAt: new Date().toISOString()
+        });
+        return AuthStore.refreshTenant().then(() => s, () => s);
       });
     },
 
-    /* Prototype sign-in: any known-shaped email opens a paid session. Real
-       authentication happens server-side. */
-    signIn(email) {
-      const local = String(email || '').split('@')[0].replace(/[._-]+/g, ' ').trim();
-      const name = local.replace(/\b\w/g, c => c.toUpperCase()) || 'Account Owner';
-      return write({
-        mode: 'paid', plan: 'Professional',
-        name, initials: initials(name), email,
-        business: 'Your Business', role: 'Super Admin',
-        createdAt: new Date().toISOString()
-      });
+    /* Reads the workspace this account belongs to. Returns nothing until the
+       custom access token hook is registered, because the tenant policy matches
+       on a claim the token does not carry yet — so the name falls back rather
+       than the app breaking. */
+    refreshTenant() {
+      const sb = window.NHRSupabase;
+      const s = read();
+      if (!sb || !sb.enabled() || !s || !s.userId) return Promise.resolve(s);
+      return sb.client()
+        .then(db => db.from('tenants').select('name, plan, status, trial_ends_at').limit(1))
+        .then(res => {
+          const row = res.data && res.data[0];
+          if (!row) return s;
+          const cur = read();
+          if (!cur) return cur;
+          cur.business = row.name;
+          if (row.status === 'trial' && row.trial_ends_at) {
+            cur.mode = 'trial';
+            cur.trialEndsAt = row.trial_ends_at;
+          }
+          return write(cur);
+        })
+        .catch(() => s);
+    },
+
+    /* Rebuilds the local cache from the server session, so signing in on a
+       second device shows a signed-in app after a refresh. */
+    restore() {
+      const sb = window.NHRSupabase;
+      if (!sb || !sb.enabled()) return Promise.resolve(read());
+      return sb.currentUser().then(user => {
+        const s = read();
+        if (!user) {
+          // Demo sessions are local by design and must survive.
+          if (s && s.mode === 'demo') return s;
+          return s && s.userId ? write(null) : s;
+        }
+        if (s && s.userId === user.id) return s;
+        const name = (user.user_metadata && user.user_metadata.name) || user.email.split('@')[0];
+        const next = write({
+          mode: 'paid', plan: 'Professional',
+          name, initials: initials(name), email: user.email,
+          business: 'Your Business', role: 'Super Admin',
+          userId: user.id,
+          createdAt: new Date().toISOString()
+        });
+        return AuthStore.refreshTenant().then(() => next, () => next);
+      }).catch(() => read());
+    },
+
+    resetPassword(email) {
+      const sb = window.NHRSupabase;
+      if (!sb || !sb.enabled()) return Promise.reject(new Error('Password reset needs the live service.'));
+      return sb.resetPassword(email);
     },
 
     startDemo() {
@@ -111,7 +206,11 @@
       });
     },
 
-    signOut() { return write(null); },
+    signOut() {
+      const sb = window.NHRSupabase;
+      if (sb && sb.enabled()) sb.signOut();
+      return write(null);
+    },
 
     setPlan(plan) {
       const s = read();

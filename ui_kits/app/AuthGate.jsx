@@ -48,7 +48,17 @@ function AuthScreen({ onIn }) {
   const [f, setF] = React.useState({ firstName: '', lastName: '', business: '', email: '', password: '', employees: '', plan: 'Professional' });
   const [signin, setSignin] = React.useState({ email: '', password: '' });
   const [errors, setErrors] = React.useState({});
+  const [busy, setBusy] = React.useState(false);
+  const [notice, setNotice] = React.useState(null);
   const set = (k, v) => setF(p => Object.assign({}, p, { [k]: v }));
+
+  const formMessage = (errors.form || notice) ? (
+    <p role="alert" style={{ margin: 0, padding: '11px 13px', borderRadius: 'var(--radius-btn)', fontSize: 13.5, lineHeight: 1.55,
+      background: errors.form ? 'rgba(242,84,91,.12)' : 'rgba(0,229,212,.10)',
+      color: errors.form ? 'var(--nhr-danger)' : 'var(--nhr-turquoise)' }}>
+      {errors.form || notice}
+    </p>
+  ) : null;
 
   function submitTrial() {
     const e = {};
@@ -56,20 +66,38 @@ function AuthScreen({ onIn }) {
     if (!f.lastName.trim()) e.lastName = 'Required';
     if (!f.business.trim()) e.business = 'Required';
     if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(f.email)) e.email = 'Enter a valid work email';
-    if (f.password.length < 8) e.password = 'Use at least 8 characters';
+    if (f.password.length < 10) e.password = 'Use at least 10 characters';
     setErrors(e);
     if (Object.keys(e).length) return;
-    A.signUp(f);
-    onIn();
+    setBusy(true);
+    A.signUp(f)
+      .then(() => { setBusy(false); onIn(); })
+      .catch(err => { setBusy(false); setErrors(Object.assign({}, err.fields || {}, { form: err.message })); });
   }
+
   function submitSignin() {
     const e = {};
     if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(signin.email)) e.email = 'Enter a valid email';
     if (!signin.password) e.password = 'Required';
     setErrors(e);
     if (Object.keys(e).length) return;
-    A.signIn(signin.email);
-    onIn();
+    setBusy(true);
+    A.signIn(signin.email, signin.password)
+      .then(() => { setBusy(false); onIn(); })
+      .catch(err => { setBusy(false); setErrors({ form: err.message }); });
+  }
+
+  function sendReset() {
+    if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(signin.email)) {
+      setErrors({ email: 'Enter your email first, then choose Reset password.' });
+      return;
+    }
+    setBusy(true);
+    A.resetPassword(signin.email)
+      /* Says "if there is an account" on purpose: confirming an address exists
+         would tell anyone whose customers we have. */
+      .then(() => { setBusy(false); setNotice('If there is an account for that address, a reset link is on its way.'); setErrors({}); })
+      .catch(err => { setBusy(false); setErrors({ form: err.message }); });
   }
 
   const tab = (id, label) => (
@@ -99,15 +127,19 @@ function AuthScreen({ onIn }) {
                 <TextField label="Last name" required value={f.lastName} onChange={v => set('lastName', v)} error={errors.lastName} />
                 <TextField label="Business name" required span={2} value={f.business} onChange={v => set('business', v)} error={errors.business} />
                 <TextField label="Work email" required span={2} type="email" value={f.email} onChange={v => set('email', v)} error={errors.email} placeholder="you@yourbusiness.co.uk" />
-                <TextField label="Password" required span={2} type="password" value={f.password} onChange={v => set('password', v)} error={errors.password} hint="At least 8 characters." />
+                <TextField label="Password" required span={2} type="password" value={f.password} onChange={v => set('password', v)} error={errors.password} hint="At least 10 characters. Length beats complexity." />
                 <SelectField label="Number of employees" value={f.employees} onChange={v => set('employees', v)}
                   options={['1–5', '6–15', '16–50', '51–150', '150+']} placeholder="Select…" />
                 <SelectField label="Plan to trial" value={f.plan} onChange={v => set('plan', v)}
                   options={['Starter', 'Professional', 'Business']} />
               </div>
-              <Button onClick={submitTrial} iconRight={<Icon name="ArrowRight" size={18} />}>Start Free Trial</Button>
+              {formMessage}
+              <Button onClick={submitTrial} disabled={busy} iconRight={<Icon name="ArrowRight" size={18} />}>
+                {busy ? 'Creating your workspace…' : 'Start Free Trial'}
+              </Button>
               <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: 'var(--text-muted-dark)' }}>
                 By starting a trial you agree to the terms and privacy policy. Your trial locks after 14 days unless you choose a plan.
+                Your account works on any device — sign in with the same email and password.
               </p>
             </React.Fragment>
           ) : (
@@ -120,8 +152,14 @@ function AuthScreen({ onIn }) {
                 <TextField label="Email" required type="email" value={signin.email} onChange={v => setSignin(p => Object.assign({}, p, { email: v }))} error={errors.email} />
                 <TextField label="Password" required type="password" value={signin.password} onChange={v => setSignin(p => Object.assign({}, p, { password: v }))} error={errors.password} />
               </div>
-              <Button onClick={submitSignin} iconRight={<Icon name="ArrowRight" size={18} />}>Sign In</Button>
-              <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted-dark)' }}>No account yet? Start a free trial above, or <a href="../website/pricing.html">see pricing</a>.</p>
+              {formMessage}
+              <Button onClick={submitSignin} disabled={busy} iconRight={<Icon name="ArrowRight" size={18} />}>
+                {busy ? 'Signing in…' : 'Sign In'}
+              </Button>
+              <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted-dark)' }}>
+                <button type="button" onClick={sendReset} style={{ padding: 0, background: 'none', border: 0, color: 'var(--nhr-turquoise)', font: 'inherit', cursor: 'pointer' }}>Reset password</button>
+                {' · '}No account yet? Start a free trial above, or <a href="../website/pricing.html">see pricing</a>.
+              </p>
             </React.Fragment>
           )}
 
@@ -227,7 +265,16 @@ function ModuleLocked({ name, onChange }) {
 function AppGate({ children }) {
   const A = window.AuthStore;
   const [, force] = React.useReducer(n => n + 1, 0);
+  /* Signed in on another device? The server session is the truth, so check it
+     before deciding this browser is signed out. */
+  const [checking, setChecking] = React.useState(!A.isAuthed() && !!(window.NHRSupabase && window.NHRSupabase.enabled()));
   React.useEffect(() => A.subscribe(force), []);
+  React.useEffect(() => {
+    if (!A.restore) { setChecking(false); return; }
+    A.restore().then(() => setChecking(false)).catch(() => setChecking(false));
+  }, []);
+
+  if (checking) return null;
   if (!A.isAuthed()) return <AuthScreen onIn={force} />;
   if (A.isExpired()) return <TrialExpired onChange={force} />;
   return (
