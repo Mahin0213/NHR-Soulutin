@@ -27,6 +27,11 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Render pages to static HTML
         run: node .github/prerender/prerender.mjs
+        env:
+          # Publishable key: it is sent to every browser anyway, and access is
+          # controlled by row-level security. Never put a secret key here.
+          NEXT_PUBLIC_SUPABASE_URL: https://zmjntomnvwcnzaklodno.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Md8U0IfFBw5YgrG83q8F8A_MfRQ65ve
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

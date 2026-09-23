@@ -33,3 +33,6 @@ pnpm-debug.log*
 # Local database dumps
 *.sql.gz
 *.dump
+
+# Generated from .env by npm run supabase:config
+ui_kits/website/supabase-config.js

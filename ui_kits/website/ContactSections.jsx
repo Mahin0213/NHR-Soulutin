@@ -83,6 +83,8 @@ function ContactForm() {
   const [touched, setTouched] = React.useState({});
   const [errors, setErrors] = React.useState({});
   const [sent, setSent] = React.useState(null);
+  const [sending, setSending] = React.useState(false);
+  const [sendError, setSendError] = React.useState(null);
 
   const route = CONTACT_ROUTES[f.type];
   const supportDiversion = f.type === 'Product support' && f.existing === 'Yes';
@@ -119,6 +121,14 @@ function ContactForm() {
     setErrors(prev => Object.assign({}, prev, e[name] ? { [name]: e[name] } : { [name]: undefined }));
   }
 
+  /* A data protection request starts a statutory one-month clock the moment it
+     arrives, so the deadline is stored with it rather than worked out later. */
+  function dsrDueOn() {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+
   function submit(ev) {
     ev.preventDefault();
     const e = validate(f);
@@ -128,12 +138,37 @@ function ContactForm() {
       setTouched(keys.reduce((a, k) => Object.assign(a, { [k]: true }), Object.assign({}, touched)));
       return;
     }
-    const saved = ContactStore.add({
+    setSendError(null);
+
+    const local = () => setSent(ContactStore.add({
       type: f.type, team: route.team, name: f.firstName + ' ' + f.lastName,
       email: f.email, phone: f.phone, company: f.company,
       employees: f.employees, existing: f.existing, message: f.message
+    }));
+
+    if (!window.NHRSupabase || !window.NHRSupabase.enabled()) { local(); return; }
+
+    const isDsr = f.type === 'Data protection request';
+    setSending(true);
+    window.NHRSupabase.submitEnquiry({
+      name: (f.firstName + ' ' + f.lastName).trim(),
+      email: f.email.trim(),
+      phone: f.phone.trim() || null,
+      company: f.company.trim() || null,
+      employee_band: f.employees,
+      route: route.team,
+      subject: f.type,
+      message: f.message.trim(),
+      is_dsr: isDsr,
+      dsr_due_on: isDsr ? dsrDueOn() : null,
+      source_page: location.pathname
+    }).then(() => {
+      setSending(false);
+      local();
+    }).catch((err) => {
+      setSending(false);
+      setSendError('Your enquiry could not be sent: ' + err.message + ' Please try again, or email the team directly.');
     });
-    setSent(saved);
   }
 
   if (sent) {
@@ -293,11 +328,19 @@ function ContactForm() {
           </span>
         )}
 
-        <Button type="submit" size="lg" iconRight={<Icon name="ArrowRight" size={18} />}>Send Enquiry</Button>
+        {sendError && (
+          <span role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, lineHeight: 1.6, color: 'var(--nhr-danger)' }}>
+            <Icon name="TriangleAlert" size={14} style={{ marginTop: 2, flex: '0 0 auto' }} />{sendError}
+          </span>
+        )}
+
+        <Button type="submit" size="lg" disabled={sending} iconRight={<Icon name="ArrowRight" size={18} />}>
+          {sending ? 'Sending…' : 'Send Enquiry'}
+        </Button>
 
         <span style={{ fontSize: 12.5, lineHeight: 1.7, color: 'var(--text-muted-light)' }}>
-          In this prototype nothing is emailed anywhere — the enquiry is kept in your browser so the confirmation can
-          show a reference. See the privacy notice for how a live deployment would handle your details.
+          Your enquiry is stored securely and read only by the NHR Solution team — no email is sent automatically yet.
+          See the privacy notice for how your details are handled.
         </span>
       </form>
     </Card>

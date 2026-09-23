@@ -124,6 +124,8 @@ function DemoForm({ onBooked }) {
   const [done, setDone] = React.useState([]);
   const [errors, setErrors] = React.useState({});
   const [booked, setBooked] = React.useState(null);
+  const [sending, setSending] = React.useState(false);
+  const [sendError, setSendError] = React.useState(null);
   const [f, setF] = React.useState({
     firstName: '', lastName: '', email: '', phone: '',
     business: '', employees: '6–10', industry: 'Healthcare', role: '',
@@ -167,14 +169,42 @@ function DemoForm({ onBooked }) {
   function submit() {
     const e = validateStep(2, f);
     if (Object.keys(e).length) { setErrors(e); return; }
-    const saved = DemoStore.add({
-      name: f.firstName + ' ' + f.lastName, email: f.email, phone: f.phone,
-      business: f.business, employees: f.employees, industry: f.industry, role: f.role,
-      interests: f.interests.slice(), date: f.date, time: f.time, message: f.message
+    setSendError(null);
+
+    const local = () => {
+      const saved = DemoStore.add({
+        name: f.firstName + ' ' + f.lastName, email: f.email, phone: f.phone,
+        business: f.business, employees: f.employees, industry: f.industry, role: f.role,
+        interests: f.interests.slice(), date: f.date, time: f.time, message: f.message
+      });
+      setDone([0, 1, 2]);
+      setBooked(saved);
+      if (onBooked) onBooked(saved);
+    };
+
+    if (!window.NHRSupabase || !window.NHRSupabase.enabled()) { local(); return; }
+
+    setSending(true);
+    window.NHRSupabase.submitDemoBooking({
+      first_name: f.firstName.trim(),
+      last_name: f.lastName.trim(),
+      email: f.email.trim(),
+      phone: f.phone.trim() || null,
+      company: f.business.trim(),
+      employee_band: f.employees,
+      sector: f.industry,
+      modules_of_interest: f.interests.slice(),
+      preferred_on: f.date || null,
+      preferred_slot: f.time || null,
+      message: [f.role ? 'Role: ' + f.role : '', f.message].filter(Boolean).join(' — ') || null,
+      source_page: location.pathname
+    }).then(() => {
+      setSending(false);
+      local();
+    }).catch((err) => {
+      setSending(false);
+      setSendError('Your booking could not be sent: ' + err.message + ' Please try again.');
     });
-    setDone([0, 1, 2]);
-    setBooked(saved);
-    if (onBooked) onBooked(saved);
   }
 
   function toggleInterest(label) {
@@ -426,6 +456,12 @@ function DemoForm({ onBooked }) {
         </div>
       )}
 
+      {sendError && (
+        <span role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, lineHeight: 1.6, color: 'var(--nhr-danger)' }}>
+          <Icon name="TriangleAlert" size={14} style={{ marginTop: 2, flex: '0 0 auto' }} />{sendError}
+        </span>
+      )}
+
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 4 }}>
         {step > 0 && (
           <Button variant="secondary" onClick={() => { setErrors({}); setStep(step - 1); }} iconLeft={<Icon name="ChevronLeft" size={17} />}>Back</Button>
@@ -433,7 +469,9 @@ function DemoForm({ onBooked }) {
         <span style={{ flex: 1 }} />
         {step < 2
           ? <Button size="lg" onClick={next} iconRight={<Icon name="ArrowRight" size={18} />}>Continue</Button>
-          : <Button size="lg" onClick={submit} iconRight={<Icon name="CalendarCheck" size={18} />}>Book My Demo</Button>}
+          : <Button size="lg" onClick={submit} disabled={sending} iconRight={<Icon name="CalendarCheck" size={18} />}>
+              {sending ? 'Booking…' : 'Book My Demo'}
+            </Button>}
       </div>
     </Card>
     </div>

@@ -61,8 +61,42 @@ function SignupModal() {
   const [mode, setMode] = React.useState('trial');
   const [sent, setSent] = React.useState(false);
   const [form, setForm] = React.useState({ name: '', email: '', company: '', tier: '', phone: '', date: '' });
+  const [sending, setSending] = React.useState(false);
+  const [sendError, setSendError] = React.useState(null);
   const set = (k, v) => setForm(f => Object.assign({}, f, { [k]: v }));
   const opts = React.useMemo(() => tierOptions(), []);
+
+  /* Both modes land in enquiries: this is an interest form, not a sign-up —
+     creating an account needs the provisioning flow and a real login. */
+  function submit(ev) {
+    ev.preventDefault();
+    setSendError(null);
+    const isDemo = mode === 'demo';
+
+    if (!window.NHRSupabase || !window.NHRSupabase.enabled()) { setSent(true); return; }
+
+    setSending(true);
+    window.NHRSupabase.submitEnquiry({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim() || null,
+      company: form.company.trim() || null,
+      employee_band: form.tier || null,
+      route: 'Sales',
+      subject: isDemo ? 'Demo request' : 'Free trial request',
+      message: [
+        isDemo ? 'Demo requested from the site.' : 'Free trial requested from the site.',
+        form.date ? 'Preferred date: ' + form.date : ''
+      ].filter(Boolean).join(' '),
+      source_page: location.pathname
+    }).then(() => {
+      setSending(false);
+      setSent(true);
+    }).catch((err) => {
+      setSending(false);
+      setSendError('That could not be sent: ' + err.message + ' Please try again.');
+    });
+  }
 
   React.useEffect(() => {
     if (!form.tier && opts.length) set('tier', opts[0].value);
@@ -116,7 +150,7 @@ function SignupModal() {
             <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: '#3B4747' }}>
               {demo
                 ? 'Someone from the team will confirm your slot by email within one working day.'
-                : 'Check ' + (form.email || 'your inbox') + ' for your workspace link. Nothing is charged during the trial.'}
+                : 'Your request is with the team, who will set your workspace up and email ' + (form.email || 'you') + ' within one working day. Nothing is charged during the trial.'}
             </p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <Button onClick={() => setOpen(false)}>Close</Button>
@@ -124,7 +158,7 @@ function SignupModal() {
             </div>
           </div>
         ) : (
-          <form onSubmit={e => { e.preventDefault(); setSent(true); }} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 40 }}>
               <h2 style={{ margin: 0, fontSize: 'clamp(24px,3.4vw,30px)', fontWeight: 800, letterSpacing: '-.025em', lineHeight: 1.15, color: 'var(--nhr-text-dark)' }}>
                 {demo ? 'Book a demo' : 'Start your free 30-day trial'}
@@ -141,12 +175,16 @@ function SignupModal() {
             <ModalInput label="Phone number" type="tel" placeholder="+44 7700 000000" value={form.phone} onChange={v => set('phone', v)} />
             {demo && <ModalInput label="Preferred date" type="date" value={form.date} onChange={v => set('date', v)} />}
 
-            <Button type="submit" size="lg" fullWidth iconRight={<Icon name="ArrowRight" size={20} />}>
-              {demo ? 'Book my demo' : 'Start free trial'}
+            {sendError && (
+              <p role="alert" style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: 'var(--nhr-danger)' }}>{sendError}</p>
+            )}
+
+            <Button type="submit" size="lg" fullWidth disabled={sending} iconRight={<Icon name="ArrowRight" size={20} />}>
+              {sending ? 'Sending…' : (demo ? 'Book my demo' : 'Start free trial')}
             </Button>
 
             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: '#8A9998' }}>
-              Prices exclude VAT. By continuing you agree to the Privacy Policy — no data leaves this demo.
+              Prices exclude VAT. By continuing you agree to the Privacy Policy.
             </p>
           </form>
         )}

@@ -16,6 +16,11 @@
 
 begin;
 
+-- app.visible_employee_ids() below selects from employees, which 0002 creates.
+-- Postgres validates SQL function bodies at creation time, so without this the
+-- migration fails on a clean database with "relation employees does not exist".
+set local check_function_bodies = off;
+
 create extension if not exists pgcrypto;
 create extension if not exists citext;
 create extension if not exists pg_trgm;      -- employee name search
