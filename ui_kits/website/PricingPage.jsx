@@ -80,7 +80,7 @@ function PricingPageBody() {
   const faqs = [
     { q: 'How is the price calculated?', a: 'By team size. There is one plan with every feature, priced per month: ' + bandList + '.' },
     { q: 'What if I have more than ' + top + ' employees?', a: 'Contact the team for a quote based on your headcount.' },
-    { q: 'Do prices include VAT?', a: 'No. All prices are per month and exclude VAT.' },
+    { q: 'Is VAT added at checkout?', a: 'No. NHR Solution is not VAT registered, so the price you see is the price you pay.' },
     { q: 'Is there a discount for paying yearly?', a: 'Yes. Yearly billing costs ' + P.annualMonths + ' times the monthly price, so you get two months free.' },
     { q: 'What counts as an employee?', a: 'Anyone with a record in your workspace. Employees who leave stop counting from the following billing period.' }
   ];
@@ -114,7 +114,7 @@ function PricingPageBody() {
           <PriceBands annual={annual} />
         </div>
         <p style={{ margin: '28px auto 0', maxWidth: 720, textAlign: 'center', fontSize: 13.5, color: 'var(--text-muted-on-light)' }}>
-          Prices are per {annual ? 'year' : 'month'} and exclude VAT. Yearly billing is {P.annualMonths} × the monthly price.
+          Prices are per {annual ? 'year' : 'month'}, with no VAT added. Yearly billing is {P.annualMonths} × the monthly price.
         </p>
       </Section>
 

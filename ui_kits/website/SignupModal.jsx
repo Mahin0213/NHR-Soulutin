@@ -4,7 +4,7 @@ const { Button, IconButton, Badge } = window.NHRSolutionDesignSystem_0db691;
 function tierOptions() {
   return window.NHR_SITE.signupTiers.map(t => {
     const band = window.nhrPriceFor(t.employees);
-    return { value: t.label, label: t.label + (band ? ' (£' + band.monthly + '/month + VAT)' : ' (contact us)') };
+    return { value: t.label, label: t.label + (band ? ' (£' + band.monthly + '/month)' : ' (contact us)') };
   });
 }
 
@@ -184,7 +184,7 @@ function SignupModal() {
             </Button>
 
             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: '#8A9998' }}>
-              Prices exclude VAT. By continuing you agree to the Privacy Policy.
+              No VAT is added. By continuing you agree to the Privacy Policy.
             </p>
           </form>
         )}

@@ -336,7 +336,7 @@ function PricingPreview() {
   return (
     <Section subtle id="pricing-preview">
       <SectionHeading align="center" eyebrow="Pricing" title="Simple Pricing. Every Feature Included."
-        description={'One plan, priced by team size — from £' + P.bands[0].monthly + ' a month. Prices exclude VAT.'} />
+        description={'One plan, priced by team size — from £' + P.bands[0].monthly + ' a month. No VAT is charged.'} />
       <div style={{ marginTop: 48 }}>
         <PriceBands annual={false} />
       </div>

@@ -301,7 +301,7 @@ function DemoForm({ onBooked }) {
               <Icon name="Calculator" size={18} style={{ flex: '0 0 auto', color: 'var(--nhr-turquoise-ink)' }} />
               <span style={{ flex: 1, minWidth: 200, fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-body)' }}>
                 {band
-                  ? <React.Fragment><strong style={{ color: 'var(--text-heading)' }}>£{band.monthly} a month</strong> plus VAT for {f.employees} employees, with every feature included. </React.Fragment>
+                  ? <React.Fragment><strong style={{ color: 'var(--text-heading)' }}>£{band.monthly} a month</strong> for {f.employees} employees, with every feature included. </React.Fragment>
                   : <React.Fragment>Teams of 21 or more get a quote, which we can cover on the call. </React.Fragment>}
                 See all prices on <a href="pricing.html" style={{ fontWeight: 700, color: 'var(--nhr-turquoise-ink)' }}>the pricing page</a>.
               </span>

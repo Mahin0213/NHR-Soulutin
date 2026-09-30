@@ -100,7 +100,7 @@ window.NHR_SITE = {
   ],
 
   /* PRICING — single source of truth, edit here only. One plan with every
-     feature, priced by headcount band: per month, excluding VAT. Yearly billing
+     feature, priced by headcount band, per month. No VAT: not registered. Yearly billing
      is annualMonths × the monthly price. Above the last band is quoted. */
   pricing: {
     annualMonths: 10,
